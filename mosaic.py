@@ -12,7 +12,7 @@ from config import get_config
 from converter import convert_image
 
 CONFIG_FILE = 'config.ini'
-UPDATE_TIME = 30
+UPDATE_TIME = 15
 LOG_FILE = 'mosaic.log'
 FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 

@@ -58,14 +58,18 @@ class App():
     def resize(self):
         w = self.w
         h = self.h
-        pilImage = Image.open('data/mosaic.png')
-        imgWidth, imgHeight = pilImage.size
-        if imgWidth > w or imgHeight > h:
-            ratio = min(w/imgWidth, h/imgHeight)
-            imgWidth = int(imgWidth*ratio)
-            imgHeight = int(imgHeight*ratio)
-            pilImage = pilImage.resize((imgWidth, imgHeight), Image.ANTIALIAS)
-        self.image = ImageTk.PhotoImage(pilImage)
+        try:
+            pilImage = Image.open('data/mosaic.png')
+            imgWidth, imgHeight = pilImage.size
+            if imgWidth > w or imgHeight > h:
+                ratio = min(w/imgWidth, h/imgHeight)
+                imgWidth = int(imgWidth*ratio)
+                imgHeight = int(imgHeight*ratio)
+                pilImage = pilImage.resize((imgWidth, imgHeight), Image.ANTIALIAS)
+            image = ImageTk.PhotoImage(pilImage)
+            self.image = image
+        except OSError:
+            pass
 
     def quit(self):
         self.root.destroy()
@@ -85,11 +89,11 @@ def main():
 
 if __name__ == "__main__":
     logger.info('Start')
-    main()
-    # try:
-    #     main()
-    # except Exception as ex:
-    #     logger.error('Unknown error')
-    #     logger.error(str(ex))
-    #     sys.exit(1)
+    # main()
+    try:
+        main()
+    except Exception as ex:
+        logger.error('Unknown error')
+        logger.error(str(ex))
+        sys.exit(1)
     logger.info('Finished!')

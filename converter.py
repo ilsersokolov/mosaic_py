@@ -9,7 +9,7 @@ from PIL import Image
 from config import get_config
 
 CONFIG_FILE = 'config.ini'
-UPDATE_TIME = 1*60
+UPDATE_TIME = 30
 LOG_FILE = 'converter.log'
 FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 
