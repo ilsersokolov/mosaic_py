@@ -82,6 +82,9 @@ def load_photos(worked_dir, url):
             response = get(url, verify=True)
         except ConnectionError:
             logger.error('Connection error')
+            logger.info(f'waiting {UPDATE_TIME} s')
+            time.sleep(UPDATE_TIME)
+            logger.info('Exit with sys 1')
             sys.exit(1)
         answer = response.json()
         try:
