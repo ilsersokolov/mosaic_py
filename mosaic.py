@@ -148,20 +148,29 @@ def mosaic(logo_dir, tmp_file, mask_file, max_h, max_w, img_size, img_dir,metric
         filename = str(part[0])+'_'+str(part[1])
         dic_map[filename] = (image, 0)
 
+    black_img = Image.new('RGBA',mosaic.size, (0,0,0,0))
+
     for key, value in dic_map.items():
         im = Image.open(os.path.join(src_dir,value[0]+'.png'))
         i, j = key.split('_')
         i = int(i)
         j = int(j)
         box = (i*img_size,j*img_size,img_size*(i+1),img_size*(j+1))
+        alpha_im = Image.new('RGBA',(img_size,img_size), (0,0,0,255))
+        black_img.paste(alpha_im, box, alpha_im)
         mosaic.paste(im,box)
     
+    r,g,b,a = black_img.split()
+    a = a.point(lambda p: 255-p)
+    black_img = Image.merge(black_img.mode, (r, g, b, a))
+
     mask_img = Image.open(os.path.join(logo_dir, mask_file)).convert('RGB')
     r, g, b = mask_img.getpixel((1, 1))
     mask_img_full = Image.new('RGBA',mosaic.size, (r,g,b,0))
     mask_img_full.paste(mask_img,(0,0))
     mask_img_full.putalpha(153)
     mosaic.paste(mask_img_full,(0,0),mask_img_full)
+    mosaic.paste(black_img,(0,0),black_img)
     logo_img = Image.open(os.path.join(logo_dir, 'logo.png'))
     mosaic.paste(logo_img,(0,0),logo_img)
     mosaic.putalpha(255)
