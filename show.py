@@ -34,7 +34,7 @@ class App():
         self.root.focus_set()
         self.root.bind("<Escape>", lambda e: (
             e.widget.withdraw(), e.widget.quit()))
-        self.canvas = tkinter.Canvas(self.root, width=w, height=h)
+        self.canvas = tkinter.Canvas(self.root, width=w, height=h, highlightbackground='black')
         self.canvas.pack()
         self.canvas.configure(background='black')
         # image = self.resize()
