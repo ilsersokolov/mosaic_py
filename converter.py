@@ -74,7 +74,7 @@ def converter(img_size, worked_dir, src_dir, metric):
         images_done.append(photo)
 
 
-def main(img_size_s, img_dir, src_dir, metric):
+def main(img_size_s, img_dir, src_dirs, metric):
     img_size = int(img_size_s)
     worked_dir = os.path.join(img_dir, img_size_s+metric)
     try:
@@ -87,7 +87,9 @@ def main(img_size_s, img_dir, src_dir, metric):
         try:
             logger.info('Converting photos')
             tm = time.time()
-            converter(img_size, worked_dir, src_dir, metric)
+            for src_dir in src_dirs:
+                logger.info(f'in dir {src_dir}')
+                converter(img_size, worked_dir, src_dir, metric)
             print(time.time()-tm)
             logger.info('Done!')
             time.sleep(UPDATE_TIME)
@@ -102,10 +104,13 @@ if __name__ == "__main__":
     img_dir = get_option('images dirrectory')
     metric = get_option('metric')
     photos_dir = get_option('photos dirrectory')
-    hashtag = get_option('hashtag').lower()
-    src_dir = os.path.join(photos_dir, hashtag)
+    hashtags = get_option('hashtags').lower().split(',')
+    hashtags = [hashtag.strip() for hashtag in hashtags]
+    src_dirs = []
+    for hashtag in hashtags:
+        src_dirs.append(os.path.join(photos_dir, hashtag))
     try:
-        main(img_size, img_dir, src_dir, metric)
+        main(img_size, img_dir, src_dirs, metric)
     except Exception as ex:
         logger.error('Unknown error')
         logger.error(str(ex))

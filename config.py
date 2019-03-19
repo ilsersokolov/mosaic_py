@@ -7,7 +7,7 @@ def create_config(filename):
     config = configparser.ConfigParser()
     config['main'] = {}
     main = config['main']
-    main['hashtag'] = ''
+    main['hashtags'] = ''
     main['photos dirrectory'] = ''
     main['images dirrectory'] = ''
     main['metric'] = ''

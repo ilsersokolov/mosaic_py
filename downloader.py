@@ -108,19 +108,24 @@ def load_photos(worked_dir, url):
         url = answer['paging']['next']
 
 
-def main(hashtag, photos_dir, user_id, access_token):
-    worked_dir = os.path.join(photos_dir, hashtag)
-    hashtag_id = get_hashtag_id(user_id, hashtag, access_token)
-    url = f'https://graph.facebook.com/{hashtag_id}/recent_media?user_id={user_id}&limit=50&fields=id,media_url,permalink,media_type&access_token={access_token}'
-    try:
-        os.mkdir(worked_dir)
-    except FileExistsError:
-        pass
+def main(hashtags, photos_dir, user_id, access_token):
+    worked_dirs = {}
+    urls = {}
+    for hashtag in hashtags:
+        worked_dirs[hashtag] = os.path.join(photos_dir, hashtag)
+        hashtag_id = get_hashtag_id(user_id, hashtag, access_token)
+        urls[hashtag] = f'https://graph.facebook.com/{hashtag_id}/recent_media?user_id={user_id}&limit=50&fields=id,media_url,permalink,media_type&access_token={access_token}'
+        try:
+            os.mkdir(worked_dirs[hashtag])
+        except FileExistsError:
+            pass
     print('Press Ctrl+C to exit')
     while True:
         try:
             logger.info('Download photos')
-            load_photos(worked_dir, url)
+            for hashtag in hashtags:
+                logger.info(f'for #{hashtag.upper()}')
+                load_photos(worked_dirs[hashtag], urls[hashtag])
             logger.info('Done!')
             time.sleep(UPDATE_TIME)
         except KeyboardInterrupt:
@@ -130,7 +135,8 @@ def main(hashtag, photos_dir, user_id, access_token):
 if __name__ == "__main__":
     logger.info('Start')
     logger.info('Reading configuration')
-    hashtag = get_option('hashtag','main').lower()
+    hashtags = get_option('hashtags','main').lower().split(',')
+    hashtags = [hashtag.strip() for hashtag in hashtags]
     photos_dir = get_option('photos dirrectory','main')
     user_id = get_option('business user id')
 
@@ -142,7 +148,7 @@ if __name__ == "__main__":
         get_acces_token(app_id, app_secret)
 
     try:
-        main(hashtag, photos_dir, user_id, access_token)
+        main(hashtags, photos_dir, user_id, access_token)
     except Exception as ex:
         logger.error('Unknown error')
         logger.error(str(ex))
