@@ -115,29 +115,35 @@ def mosaic(logo_dir, tmp_file, mask_file, max_h, max_w, img_size, img_dir,metric
         if i >= h*w:
             break
         path = data[1]
-        with open(os.path.join(src_dir+'t',os.path.basename(path)[:-4]+'.bin'),'rb') as f:
+        src_name = os.path.basename(path)[:-4]
+        with open(os.path.join(src_dir+'t',src_name+'.bin'),'rb') as f:
             im_src = np.load(f)
         min_dist = -1
         bst_part = ''
-        if worked_parts.shape[0] <= len(done_parts):
-            # TODO: fix images
-            bad_images.append(os.path.basename(path)[:-4])
-        else:
-            for part in worked_parts:
-                filename = str(part[0])+'_'+str(part[1])
+        is_fill = worked_parts.shape[0] <= len(done_parts)
+        for part in worked_parts:
+            filename = str(part[0])+'_'+str(part[1])
+            if not is_fill:
                 if filename in done_parts:
                     continue
-                im_arr = im_src[dic_alpha[filename],:]
-                # dist = distance.euclidean(np.array(dic_etalons[filename]).ravel(),np.array(im_arr).ravel())
-                dist = euclidean(np.array(dic_etalons[filename]).ravel(),np.array(im_arr).ravel())
-                if bst_part == '':
+            im_arr = im_src[dic_alpha[filename],:]
+            # dist = distance.euclidean(np.array(dic_etalons[filename]).ravel(),np.array(im_arr).ravel())
+            dist = euclidean(np.array(dic_etalons[filename]).ravel(),np.array(im_arr).ravel())
+            if bst_part == '':
+                min_dist = dist
+                bst_part = filename
+            else:
+                if min_dist> dist:
                     min_dist = dist
                     bst_part = filename
-                else:
-                    if min_dist> dist:
-                        min_dist = dist
-                        bst_part = filename
-            dic_map[bst_part] = (os.path.basename(path)[:-4], min_dist)
+        if is_fill:
+            if dic_map[bst_part][1]>min_dist:
+                bad_images.append(dic_map[bst_part][0])
+                dic_map[bst_part] = (src_name, min_dist)
+            else:
+                bad_images.append(src_name)
+        else:
+            dic_map[bst_part] = (src_name, min_dist)
             done_parts.append(bst_part)
     
     np.random.shuffle(any_parts)
@@ -145,8 +151,8 @@ def mosaic(logo_dir, tmp_file, mask_file, max_h, max_w, img_size, img_dir,metric
     for part in any_parts:
         if len(bad_images) == 0:
             continue
-        image = bad_images.pop(np.random.choice(len(bad_images)))
-        # image = bad_images.pop()
+        # image = bad_images.pop(np.random.choice(len(bad_images)))
+        image = bad_images.pop()
         filename = str(part[0])+'_'+str(part[1])
         dic_map[filename] = (image, 0)
 
