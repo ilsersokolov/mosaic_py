@@ -143,12 +143,12 @@ def mosaic(logo_dir, tmp_file, mask_file, max_h, max_w, img_size, img_dir,metric
     for part in any_parts:
         if len(bad_images) == 0:
             continue
-        # image = bad_images.pop(np.random.choice(len(bad_images)))
-        image = bad_images.pop()
+        image = bad_images.pop(np.random.choice(len(bad_images)))
+        # image = bad_images.pop()
         filename = str(part[0])+'_'+str(part[1])
         dic_map[filename] = (image, 0)
 
-    black_img = Image.new('RGBA',mosaic.size, (0,0,0,0))
+    black_mask = Image.new('L',mosaic.size, (0))
 
     for key, value in dic_map.items():
         im = Image.open(os.path.join(src_dir,value[0]+'.png'))
@@ -156,13 +156,9 @@ def mosaic(logo_dir, tmp_file, mask_file, max_h, max_w, img_size, img_dir,metric
         i = int(i)
         j = int(j)
         box = (i*img_size,j*img_size,img_size*(i+1),img_size*(j+1))
-        alpha_im = Image.new('RGBA',(img_size,img_size), (0,0,0,255))
-        black_img.paste(alpha_im, box, alpha_im)
+        alpha_im = Image.new('L',(img_size,img_size), (255))
+        black_mask.paste(alpha_im, box)
         mosaic.paste(im,box)
-    
-    r,g,b,a = black_img.split()
-    a = a.point(lambda p: 255-p)
-    black_img = Image.merge(black_img.mode, (r, g, b, a))
 
     mask_img = Image.open(os.path.join(logo_dir, mask_file)).convert('RGB')
     r, g, b = mask_img.getpixel((1, 1))
@@ -170,7 +166,7 @@ def mosaic(logo_dir, tmp_file, mask_file, max_h, max_w, img_size, img_dir,metric
     mask_img_full.paste(mask_img,(0,0))
     mask_img_full.putalpha(153)
     mosaic.paste(mask_img_full,(0,0),mask_img_full)
-    mosaic.paste(black_img,(0,0),black_img)
+    mosaic = Image.composite(mosaic,Image.new('RGB',mosaic.size,(0,0,0)),black_mask)
     logo_img = Image.open(os.path.join(logo_dir, 'logo.png'))
     mosaic.paste(logo_img,(0,0),logo_img)
     mosaic.putalpha(255)
