@@ -140,6 +140,8 @@ def mosaic(logo_dir, tmp_file, mask_file, max_h, max_w, img_size, img_dir,metric
             dic_map[bst_part] = (os.path.basename(path)[:-4], min_dist)
             done_parts.append(bst_part)
     
+    np.random.shuffle(any_parts)
+
     for part in any_parts:
         if len(bad_images) == 0:
             continue
