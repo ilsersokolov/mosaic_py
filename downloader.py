@@ -104,8 +104,11 @@ def load_photos(worked_dir, url):
                     shutil.copyfileobj(response.raw, out_file)
                 del response
                 photos_done.append(filename)
-
-        url = answer['paging']['next']
+        try:
+            url = answer['paging']['next']
+        except KeyError:
+            work = False
+            logger.info('all photoes at last 24 hours downloaded')
 
 
 def main(hashtags, photos_dir, user_id, access_token):
@@ -146,6 +149,8 @@ if __name__ == "__main__":
         app_id = get_option('app id')
         app_secret = get_option('app secret')
         get_acces_token(app_id, app_secret)
+
+    # main(hashtags, photos_dir, user_id, access_token)
 
     try:
         main(hashtags, photos_dir, user_id, access_token)
