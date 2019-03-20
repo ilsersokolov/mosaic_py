@@ -116,7 +116,14 @@ def main(hashtags, photos_dir, user_id, access_token):
     urls = {}
     for hashtag in hashtags:
         worked_dirs[hashtag] = os.path.join(photos_dir, hashtag)
-        hashtag_id = get_hashtag_id(user_id, hashtag, access_token)
+        try:
+            hashtag_id = get_hashtag_id(user_id, hashtag, access_token)
+        except Exception:
+            logger.error('Connection error')
+            logger.info(f'waiting {UPDATE_TIME} s')
+            time.sleep(UPDATE_TIME)
+            logger.info('Exit with sys 1')
+            sys.exit(1)
         urls[hashtag] = f'https://graph.facebook.com/{hashtag_id}/recent_media?user_id={user_id}&limit=50&fields=id,media_url,permalink,media_type&access_token={access_token}'
         try:
             os.mkdir(worked_dirs[hashtag])
